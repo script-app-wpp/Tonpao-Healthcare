@@ -32,21 +32,24 @@
          const gasUrl = "https://script.google.com/macros/s/AKfycbwl6UCxjoa_dzyhSBZ8EA7vhLK-5YEO2UZTjudw20RUFcMraBx93PGb8MLgWbRd8FmH/exec";
 
          async function initializeLiff() {
+            // สร้างตัวเลขเวลาปัจจุบัน (Cache Buster) เพื่อบังคับให้โหลดข้อมูลใหม่เสมอ
+            const timestamp = new Date().getTime(); 
+
             try {
                await liff.init({ liffId: "2011283749-Pr7bzXG2" });
                
                if (liff.isLoggedIn()) {
-                  // ถ้าล็อกอินแล้ว ดึง Profile แล้วส่งต่อเข้า iframe
+                  // ถ้าล็อกอินแล้ว ดึง Profile แล้วส่งต่อเข้า iframe (เพิ่มตัวแปร &t=เวลาปัจจุบัน)
                   const profile = await liff.getProfile();
-                  document.getElementById('gas-iframe').src = gasUrl + "?userId=" + profile.userId;
+                  document.getElementById('gas-iframe').src = gasUrl + "?userId=" + profile.userId + "&t=" + timestamp;
                } else {
                   // ถ้ายังไม่ล็อกอิน ให้เด้งไปล็อกอิน LINE
                   liff.login();
                }
             } catch (err) {
                console.error("LIFF Initialization failed", err);
-               // กรณี Error (เช่นเปิดในคอม) ก็ให้โชว์หน้าเว็บปกติไปก่อน
-               document.getElementById('gas-iframe').src = gasUrl;
+               // กรณี Error (เช่นเปิดในคอม) ก็ให้โชว์หน้าเว็บปกติไปก่อน (เพิ่มตัวแปร ?t=เวลาปัจจุบัน)
+               document.getElementById('gas-iframe').src = gasUrl + "?t=" + timestamp;
             }
          }
 
