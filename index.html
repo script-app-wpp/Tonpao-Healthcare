@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="th">
    <head>
-      <!-- บรรทัดนี้สำคัญมาก: เพิ่ม maximum-scale=1.0 และ user-scalable=no เพื่อล็อกไม่ให้มือถือซูมจอเอง -->
       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
       <base target="_top">
       <style>
-         /* รีเซ็ตขอบหน้าจอ และล็อกไม่ให้หน้าเว็บหลัก (GitHub) เลื่อนหรือขยับได้ */
          body, html {
             margin: 0;
             padding: 0;
@@ -14,7 +12,6 @@
             overflow: hidden;
             background-color: #f1f5f9;
          }
-         /* ตั้งค่า iframe ให้เต็มจอพอดี */
          iframe {
             position: absolute;
             top: 0;
@@ -24,9 +21,36 @@
             border: 0;
          }
       </style>
+      <!-- ⭐️ โหลด LIFF SDK ไว้ที่หน้าหลัก (GitHub) ⭐️ -->
+      <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
    </head>
    <body>
-      <!-- ลิงก์ระบบจองคิวของคุณ -->
-      <iframe src="https://script.google.com/macros/s/AKfycbwl6UCxjoa_dzyhSBZ8EA7vhLK-5YEO2UZTjudw20RUFcMraBx93PGb8MLgWbRd8FmH/exec" allowfullscreen></iframe>
+      <iframe id="gas-iframe" src="" allowfullscreen></iframe>
+
+      <script>
+         // ลิงก์ระบบจองคิว (GAS) ของคุณ
+         const gasUrl = "https://script.google.com/macros/s/AKfycbwl6UCxjoa_dzyhSBZ8EA7vhLK-5YEO2UZTjudw20RUFcMraBx93PGb8MLgWbRd8FmH/exec";
+
+         async function initializeLiff() {
+            try {
+               await liff.init({ liffId: "2011283749-zxA4vojl" });
+               
+               if (liff.isLoggedIn()) {
+                  // ถ้าล็อกอินแล้ว ดึง Profile แล้วส่งต่อเข้า iframe
+                  const profile = await liff.getProfile();
+                  document.getElementById('gas-iframe').src = gasUrl + "?userId=" + profile.userId;
+               } else {
+                  // ถ้ายังไม่ล็อกอิน ให้เด้งไปล็อกอิน LINE
+                  liff.login();
+               }
+            } catch (err) {
+               console.error("LIFF Initialization failed", err);
+               // กรณี Error (เช่นเปิดในคอม) ก็ให้โชว์หน้าเว็บปกติไปก่อน
+               document.getElementById('gas-iframe').src = gasUrl;
+            }
+         }
+
+         initializeLiff();
+      </script>
    </body>
 </html>
